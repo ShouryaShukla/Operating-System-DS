@@ -2,12 +2,14 @@ import os
 import ntpath
 import socket
 
-path = 'C:\Users\shourya\PycharmProjects\OSAssignment3\ClientFolder'
+path = 'ClientFolder'
 if not os.path.exists(path):
     os.makedirs(path)
 
-File1= open("C:\Users\shourya\PycharmProjects\OSAssignment3\ClientFolder\File1.txt", "r")
+
 def sendFile(file):
+    File1=open(file, "a+")
+    File1.close()
     File= open(file, "r")
     data=File.read()
     name=findFileName(file)
@@ -38,9 +40,7 @@ if __name__ == '__main__':
 
 
 
-newpath = 'C:\Users\shourya\PycharmProjects\OSAssignment3\ClientFolder'
-if not os.path.exists(newpath):
-    os.makedirs(newpath)
+
 
 
 

@@ -1,8 +1,8 @@
 import socket
 import os
-newpath = 'C:\Users\shourya\PycharmProjects\OSAssignment3\ServerFolder'
-if not os.path.exists(newpath):
-    os.makedirs(newpath)
+path = 'ServerFolder'
+if not os.path.exists(path):
+    os.makedirs(path)
 
 def Main():
     host = '0.0.0.0'
@@ -26,7 +26,7 @@ def Main():
 
         # print "Number of results: " + str(len(data))
 
-        File= open("C:/Users/shourya/PycharmProjects/OSAssignment3/ServerFolder"+"/"+file_name, "a+")
+        File= open(path+"/"+file_name, "a+")
         File.write(file_data)
 
 
