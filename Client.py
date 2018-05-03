@@ -22,17 +22,23 @@ def findFileName(file):
 
 
 def Main():
-    ip = socket.gethostname()
+    # ip = socket.gethostname()
+    ip='10.1.31.37'
     host = ip
-    port = 2345
+    port = 1115
 
     s = socket.socket()
     s.connect((host, port))
-    print(s.recv(1024))
+    ss=s.recv(1024)
+    ss.decode()
+    print(ss)
     filePath=raw_input("Enter file path: ")
     (file_name, file_data)=sendFile(filePath)
-    s.send(file_name)
-    s.send(file_data)
+    fn=file_name.encode()
+    s.send (fn)
+    fd=file_data.encode()
+    s.send(fd)
+
 
 
 if __name__ == '__main__':
