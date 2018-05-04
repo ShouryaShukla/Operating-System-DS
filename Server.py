@@ -8,7 +8,7 @@ ServerFile = open('Server File.txt', "a+")
 def Main():
     host = socket.gethostbyname(socket.gethostname())
     port = 2222
-    txtPort= 1111
+    txtPort= 1112
     pdfPort= 3333
     mp3Port= 4444
     otherPort= 5555
@@ -48,26 +48,44 @@ def Main():
     # w.listen(1)
     # g, addr5= t.accept()
     # print ("Connection from: " + str(addr5))
-
     st = 'Please Upload file (with path) to be synced: '
     byt = st.encode()
     c.send(byt)
+    numFiles = c.recv(1024)
+    numFiles = str(numFiles.decode())
 
-    while True:
+    for i in range(0, int(numFiles)):
+        counter = 1
+        SumCurrent = ''
+        while True:
+            current = c.recv(1)
+            current = str(current.decode())
+            if current == '#' and counter == 1:
+                file_name = SumCurrent
+                print("File Name is "+file_name)
+                SumCurrent = ''
+                counter += 1
+            if current == '#' and counter == 2:
+                file_data = SumCurrent
+                file_data = file_data[1:]
+                print("File data is: "+file_data)
 
-        file_name = c.recv(1024)
-        file_name = str(file_name.decode())
+            SumCurrent += current
+            if not current:
+                break
+
+        #file_name = c.recv(1024)
+        #file_name = str(file_name.decode())
         #print("Got Name: "+file_name)
         #print(file_name)
-        time.sleep(1)
-        #print("1")
-        file_data=c.recv(1024)
-        file_data = str(file_data.decode())
+        #time.sleep(1)
+        #file_data = c.recv(1024)
+        #file_data = str(file_data.decode())
         #print("Got Data: "+file_data)
        # print(file_data)
         #file_data.decode()
-        if not file_name:
-            break
+            # if not file_name:
+            #     break
         # print "Request received from client: " + str(data)
 
         # print "Number of results: " + str(len(data))
@@ -77,15 +95,19 @@ def Main():
 
         extt = file_name.split('.')
         ext = extt[1]
-
+        print("File Name is "+file_name)
+        print("Data is "+file_data)
         if ext == 'txt':
 
             ServerFile.write(file_name + ' ' + 'txtNode ' + str(txtPort) + '\n')
-            d1 = file_name.encode()
-            d.send(d1)
-            time.sleep(2)
-            d2 = file_data.encode()
-            d.send(d2)
+
+            SendTxt = file_name + '#' + file_data + '#'
+            print("Sending: " + SendTxt)
+            SendTxt = SendTxt.encode()
+            d.send(SendTxt)
+            # time.sleep(2)
+            # d2 = file_data.encode()
+            # d.send(d2)
 
         # Haven't been able to figure this part out
         # elif(ext=='pdf'):
@@ -97,7 +119,6 @@ def Main():
         # else:
         #     ServerFile.write(file_name + ' ' + 'OoherNode' + str(otherPort))
         #    send file through otherPort
-
 
     c.close()
     d.close()
