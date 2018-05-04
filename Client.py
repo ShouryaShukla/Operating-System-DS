@@ -1,7 +1,8 @@
 import os
 import ntpath
 import socket
-import PyPDF2
+import time
+#import PyPDF2
 
 path = 'ClientFolder'
 if not os.path.exists(path):
@@ -9,28 +10,28 @@ if not os.path.exists(path):
 
 
 def sendFile(file):
-    File1=open(file, "a+")
+    File1 = open(file, "a+")
     File1.close()
-    File= open(file, "r")
-    data=File.read()
-    name=findFileName(file)
-    return (name, data)
+    File = open(file, "r")
+    data = File.read()
+    name = findFileName(file)
+    return name, data
 
 
 def findFileName(file):
-    h,t = ntpath.split(file)
+    h, t = ntpath.split(file)
     return t or ntpath.basename(h)
 
 
 def Main():
     # ip = socket.gethostname()
-    ip='10.1.33.18'
+    ip = '127.0.1.1'
     host = ip
     port = 2222
 
     s = socket.socket()
     s.connect((host, port))
-    ss=s.recv(1024)
+    ss = s.recv(1024)
     ss.decode()
     filePath=raw_input(ss)
     (file_name, file_data)=sendFile(filePath)
@@ -41,10 +42,12 @@ def Main():
 
     if(ext=='txt'):
         fn=file_name.encode()
-        s.send (fn)
-
+        print("Extention"+fn)
+        s.send(fn)
+        time.sleep(2)
         fd=file_data.encode()
         s.send(fd)
+        print("Data"+fd)
 
 
     # Haven't been able to figure this part out

@@ -1,12 +1,12 @@
 import socket
 import os
 import time
-import PyPDF2
+#import PyPDF2
 
-ServerFile= open('Server File.txt', "a+")
+ServerFile = open('Server File.txt', "a+")
 
 def Main():
-    host = '0.0.0.0'
+    host = socket.gethostbyname(socket.gethostname())
     port = 2222
     txtPort= 1111
     pdfPort= 3333
@@ -14,17 +14,17 @@ def Main():
     otherPort= 5555
 
     s = socket.socket()
-    s.bind((host,port))
+    s.bind((host, port))
 
     s.listen(1)
+    print("Server is now listening at-"+host)
     c, addr = s.accept()
     print ("Connection from: " + str(addr))
 
-
-    t=socket.socket()
+    t = socket.socket()
     t.bind((host, txtPort))
     t.listen(1)
-    d, addr2= t.accept()
+    d, addr2 = t.accept()
     print ("Connection from: " + str(addr2))
 
     #
@@ -49,7 +49,6 @@ def Main():
     # g, addr5= t.accept()
     # print ("Connection from: " + str(addr5))
 
-
     st = 'Please Upload file (with path) to be synced: '
     byt = st.encode()
     c.send(byt)
@@ -58,11 +57,13 @@ def Main():
 
         file_name = c.recv(1024)
         file_name = str(file_name.decode())
+        #print("Got Name: "+file_name)
         #print(file_name)
         time.sleep(1)
         #print("1")
         file_data=c.recv(1024)
         file_data = str(file_data.decode())
+        #print("Got Data: "+file_data)
        # print(file_data)
         #file_data.decode()
         if not file_name:
@@ -74,17 +75,16 @@ def Main():
         # File= open(path+"/"+file_name, "a+")
         # File.write(file_data)
 
-        extt=file_name.split('.')
-        ext=extt[1]
+        extt = file_name.split('.')
+        ext = extt[1]
 
+        if ext == 'txt':
 
-
-        if(ext=='txt'):
-
-            ServerFile.write(file_name + ' ' + 'txtNode ' + str(txtPort))
-            d1= file_name.encode()
+            ServerFile.write(file_name + ' ' + 'txtNode ' + str(txtPort) + '\n')
+            d1 = file_name.encode()
             d.send(d1)
-            d2= file_data.encode()
+            time.sleep(2)
+            d2 = file_data.encode()
             d.send(d2)
 
         # Haven't been able to figure this part out

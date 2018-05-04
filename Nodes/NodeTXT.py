@@ -1,14 +1,14 @@
 import os
 import socket
 import time
-import PyPDF2
+#import PyPDF2
 
 path = 'txtFolder'
 if not os.path.exists(path):
     os.makedirs(path)
 
 def Main():
-    ip = '10.1.33.18'
+    ip = '127.0.1.1'
     host = ip
     port = 1111
 
