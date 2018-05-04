@@ -1,6 +1,7 @@
 import os
 import ntpath
 import socket
+import PyPDF2
 
 path = 'ClientFolder'
 if not os.path.exists(path):
@@ -23,21 +24,36 @@ def findFileName(file):
 
 def Main():
     # ip = socket.gethostname()
-    ip='10.1.31.37'
+    ip='10.1.33.18'
     host = ip
-    port = 1115
+    port = 2222
 
     s = socket.socket()
     s.connect((host, port))
     ss=s.recv(1024)
     ss.decode()
-    print(ss)
-    filePath=raw_input("Enter file path: ")
+    filePath=raw_input(ss)
     (file_name, file_data)=sendFile(filePath)
-    fn=file_name.encode()
-    s.send (fn)
-    fd=file_data.encode()
-    s.send(fd)
+
+    extt=file_name.split('.')
+    ext=extt[1]
+
+
+    if(ext=='txt'):
+        fn=file_name.encode()
+        s.send (fn)
+
+        fd=file_data.encode()
+        s.send(fd)
+
+
+    # Haven't been able to figure this part out
+    # elif(ext=='pdf'):
+    #     ...
+    # elif (ext=='mp3'):
+    #     ...
+    # else:
+    #     ...
 
 
 
