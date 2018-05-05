@@ -38,25 +38,31 @@ def Main():
 
     s = socket.socket()
     s.connect((host, port))
-    ss = s.recv(1024)
-    ss.decode()
-    filePath = raw_input(ss)
-    (file_name, file_data) = sendFile(filePath)
+    # ss = s.recv(1024)
+    # ss.decode()
+    # filePath = raw_input(ss)
+    # (file_name, file_data) = sendFile(filePath)
 
-    extt = file_name.split('.')
-    ext = extt[1]
+    # extt = file_name.split('.')
+    # ext = extt[1]
+    Send =''
+    if NumFiles< 10:
+        Send = '00'+str(NumFiles)
+    SendNum = str(Send).encode()
+    s.send(SendNum)
 
-
-    if(ext=='txt'):
-        SendNum = str(NumFiles).encode()
-        s.send(SendNum)
-        time.sleep(1)
-        fn = (file_name + '#').encode() + (file_data + '#').encode()
+    time.sleep(2)
+    for file in onlyfiles:
+        filePath = path+'/'+file
+        print(filePath)
+        (file_name, file_data) = sendFile(filePath)
+        fn = (file_name + '#').encode() + (file_data + '$').encode()
         print("Extention "+fn)
         s.send(fn)
-        # time.sleep(2)
+        time.sleep(5)
         # fd = file_data.encode()
         # s.send(fd)
+        print("Name "+file_name)
         print("Data " + file_data)
 
 

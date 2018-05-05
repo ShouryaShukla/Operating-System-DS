@@ -21,11 +21,11 @@ def Main():
     c, addr = s.accept()
     print ("Connection from: " + str(addr))
 
-    t = socket.socket()
-    t.bind((host, txtPort))
-    t.listen(1)
-    d, addr2 = t.accept()
-    print ("Connection from: " + str(addr2))
+
+    #t.bind((host, txtPort))
+    #t.listen(1)
+    #d, addr2 = t.accept()
+    #print ("Connection from: " + str(addr2))
 
     #
     # u=socket.socket()
@@ -48,27 +48,53 @@ def Main():
     # w.listen(1)
     # g, addr5= t.accept()
     # print ("Connection from: " + str(addr5))
-    st = 'Please Upload file (with path) to be synced: '
-    byt = st.encode()
-    c.send(byt)
-    numFiles = c.recv(1024)
+
+
+    # st = 'Please Upload file (with path) to be synced: '
+    # byt = st.encode()
+    # c.send(byt)
+    numFiles = c.recv(3)
     numFiles = str(numFiles.decode())
 
-    for i in range(0, int(numFiles)):
+    t = socket.socket()
+    t.connect((host, txtPort))
+
+    print("NumFiles: "+numFiles)
+    # print(int(numFiles))
+    for i in range(0, int(numFiles)-1):
+        # print(int(numFiles[:1]))
+        file_name = ''
+        file_data = ''
         counter = 1
         SumCurrent = ''
         while True:
             current = c.recv(1)
             current = str(current.decode())
+            # print("Current: "+current)
             if current == '#' and counter == 1:
                 file_name = SumCurrent
                 print("File Name is "+file_name)
                 SumCurrent = ''
                 counter += 1
-            if current == '#' and counter == 2:
+            if current == '$' and counter == 2:
                 file_data = SumCurrent
                 file_data = file_data[1:]
                 print("File data is: "+file_data)
+
+                extt = file_name.split('.')
+                ext = extt[1]
+                print("File Name is " + file_name)
+                # print("Data is " + file_data)
+                if ext == 'txt':
+                    ServerFile.write(file_name + ' ' + 'txtNode ' + str(txtPort) + '\n')
+
+
+                    SendTxt = file_name + '#' + file_data + '$'
+                    print("Sending: " + SendTxt)
+                    SendTxt = SendTxt.encode()
+                    t.send(SendTxt)
+                    time.sleep(5)
+                break
 
             SumCurrent += current
             if not current:
@@ -93,18 +119,6 @@ def Main():
         # File= open(path+"/"+file_name, "a+")
         # File.write(file_data)
 
-        extt = file_name.split('.')
-        ext = extt[1]
-        print("File Name is "+file_name)
-        print("Data is "+file_data)
-        if ext == 'txt':
-
-            ServerFile.write(file_name + ' ' + 'txtNode ' + str(txtPort) + '\n')
-
-            SendTxt = file_name + '#' + file_data + '#'
-            print("Sending: " + SendTxt)
-            SendTxt = SendTxt.encode()
-            d.send(SendTxt)
             # time.sleep(2)
             # d2 = file_data.encode()
             # d.send(d2)
@@ -121,7 +135,7 @@ def Main():
         #    send file through otherPort
 
     c.close()
-    d.close()
+    #d.close()
     # e.close()
     # f.close()
     # g.close()
