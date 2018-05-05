@@ -10,16 +10,16 @@ if not os.path.exists(path):
 def Main():
     #ip = '127.0.1.1'
     host = socket.gethostbyname(socket.gethostname())
-    port = 3333
+    port = 4444
 
-    p = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    p.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    p.bind((host, port))
-    p.listen(1)
-    d, addr = p.accept()
+    m = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    m.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    m.bind((host, port))
+    m.listen(1)
+    d, addr = m.accept()
     print ("Connection from: " + str(addr))
 
-    print("PDF node connected to server " + str(addr[0]) + ":" + str(addr[1]))
+    print("MP3 node connected to server " + str(addr[0]) + ":" + str(addr[1]))
 
     while True:
         size = d.recv(16)
@@ -38,7 +38,7 @@ def Main():
                 data = d.recv(block)
                 f.write(data)
                 file_size -= len(data)
-        print("PDF Received " + file_name)
+        print("MP3 Received " + file_name)
 
 if __name__ == '__main__':
     Main()

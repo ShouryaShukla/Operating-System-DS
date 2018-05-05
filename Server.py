@@ -8,12 +8,14 @@ ServerFile = open('Server File.txt', "a+")
 def Main():
     host = socket.gethostbyname(socket.gethostname())
     port = 2221
-    txtPort= 1112
+    txtPort= 1111
     pdfPort= 3333
     mp3Port= 4444
     otherPort= 5555
-
-    s = socket.socket()
+    index = {}
+    storage = {"txt": txtPort, "pdf": pdfPort, "mp3": mp3Port, "other": otherPort}
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     s.bind((host, port))
 
     s.listen(1)
@@ -53,52 +55,104 @@ def Main():
     # st = 'Please Upload file (with path) to be synced: '
     # byt = st.encode()
     # c.send(byt)
-    numFiles = c.recv(3)
-    numFiles = str(numFiles.decode())
+    # numFiles = c.recv(3)
+    # numFiles = str(numFiles.decode())
 
-    t = socket.socket()
+    t = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    t.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     t.connect((host, txtPort))
 
-    print("NumFiles: "+numFiles)
-    # print(int(numFiles))
-    for i in range(0, int(numFiles)):
-        # print(int(numFiles[:1]))
-        file_name = ''
-        file_data = ''
-        counter = 1
-        SumCurrent = ''
-        while True:
-            current = c.recv(1)
-            current = str(current.decode())
-            # print("Current: "+current)
-            if current == '#' and counter == 1:
-                file_name = SumCurrent
-                #print("File Name is "+file_name)
-                SumCurrent = ''
-                counter += 1
-            if current == '$' and counter == 2:
-                file_data = SumCurrent
-                file_data = file_data[1:]
-                #print("File data is: "+file_data)
+    p = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    p.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    p.connect((host, pdfPort))
 
-                extt = file_name.split('.')
-                ext = extt[1]
-                #print("File Name is " + file_name)
-                # print("Data is " + file_data)
-                if ext == 'txt':
-                    ServerFile.write(file_name + ' ' + 'txtNode ' + str(txtPort) + '\n')
+    m = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    m.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    m.connect((host, mp3Port))
 
+    o = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    o.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    o.connect((host, otherPort))
 
-                    SendTxt = file_name + '#' + file_data + '$'
-                    print("Sending From Server: " + SendTxt)
-                    SendTxt = SendTxt.encode()
-                    t.send(SendTxt)
-                    time.sleep(5)
-                break
+    while True:
+        size = c.recv(16)
+        # print(size)
+        if not size:
+            break
+        int_size = int(size, 2)
+        file_name = c.recv(int_size).decode()
+        print(file_name)
 
-            SumCurrent += current
-            if not current:
-                break
+        file_type = file_name[file_name.index('.') + 1:]
+        if file_type != "txt" and file_type != "pdf" and file_type != "mp3":
+            file_type = "other"
+
+        index[file_name] = storage[file_type]
+        if file_type == "txt":
+            typ = t
+        elif file_type == "pdf":
+            typ = p
+        elif file_type == "mp3":
+            typ = m
+        else:
+            typ = o
+
+        typ.send(size)
+        typ.send(file_name.encode())
+
+        file_size = c.recv(32)
+        typ.send(file_size)
+        time.sleep(2)
+        file_size = int(file_size, 2)
+        block = 4096
+        while file_size > 0:
+            if file_size < block:
+                block = file_size
+            data = c.recv(block)
+            typ.send(data)
+            file_size -= len(data)
+    ServerFile.write(str(index))
+
+    # print("NumFiles: "+numFiles)
+    # # print(int(numFiles))
+    # for i in range(0, int(numFiles)):
+    #     # print(int(numFiles[:1]))
+    #     file_name = ''
+    #     file_data = ''
+    #     counter = 1
+    #     SumCurrent = ''
+    #     while True:
+    #         current = c.recv(1)
+    #         current = str(current.decode())
+    #         # print("Current: "+current)
+    #         if current == '#' and counter == 1:
+    #             file_name = SumCurrent
+    #             #print("File Name is "+file_name)
+    #             SumCurrent = ''
+    #             counter += 1
+    #         if current == '$' and counter == 2:
+    #             file_data = SumCurrent
+    #             file_data = file_data[1:]
+    #             #print("File data is: "+file_data)
+    #
+    #             extt = file_name.split('.')
+    #             ext = extt[1]
+    #             #print("File Name is " + file_name)
+    #             # print("Data is " + file_data)
+    #             if ext == 'txt':
+    #                 ServerFile.write(file_name + ' ' + 'txtNode ' + str(txtPort) + '\n')
+    #
+    #
+    #                 SendTxt = file_name + '#' + file_data + '$'
+    #                 print("Sending From Server: " + SendTxt)
+    #                 SendTxt = SendTxt.encode()
+    #                 t.send(SendTxt)
+    #                 time.sleep(5)
+    #             break
+    #
+    #         SumCurrent += current
+    #         if not current:
+    #             break
 
         #file_name = c.recv(1024)
         #file_name = str(file_name.decode())
