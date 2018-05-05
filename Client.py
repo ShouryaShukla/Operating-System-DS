@@ -11,8 +11,8 @@ if not os.path.exists(path):
     os.makedirs(path)
 
 def sendFile(file):
-    File1 = open(file, "a+")
-    File1.close()
+    # File1 = open(file, "a+")
+    # File1.close()
     File = open(file, "r")
     data = File.read()
     name = getFileName(file)
@@ -48,7 +48,7 @@ def Main():
     Send =''
     if NumFiles< 10:
         Send = '00'+str(NumFiles)
-    elif 10< NumFiles and NumFiles<100:
+    elif 10< NumFiles and NumFiles < 100:
         Send = '0'+str(NumFiles)
     SendNum = str(Send).encode()
     s.send(SendNum)

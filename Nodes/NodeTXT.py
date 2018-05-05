@@ -10,7 +10,7 @@ if not os.path.exists(path):
 def Main():
     #ip = '127.0.1.1'
     host = socket.gethostbyname(socket.gethostname())
-    port = 1111
+    port = 1112
 
     t = socket.socket()
     t.bind((host, port))
@@ -29,7 +29,7 @@ def Main():
         # print("Current: "+current)
         if current == '#' and counter == 1:
             file_name = SumCurrent
-            # print("File Name is " + file_name)
+            #print("File Name is " + file_name)
             SumCurrent = ''
             counter += 1
             # print("Path is: " + path + "/" + file_name)
@@ -37,12 +37,14 @@ def Main():
         if current == '$' and counter == 2:
             file_data = SumCurrent
             file_data = file_data[1:]
+            print("File Name is " + file_name)
             print("File data is: " + file_data)
             extt = file_name.split('.')
-            ext = extt[1]
-            print("File Name is " + file_name)
+            #ext = extt[1]
+
             File.write(file_data)
             SumCurrent = ''
+            current = ''
             counter = 1
             # print("Data is " + file_data)
     # while True:

@@ -8,7 +8,7 @@ ServerFile = open('Server File.txt', "a+")
 def Main():
     host = socket.gethostbyname(socket.gethostname())
     port = 2221
-    txtPort= 1111
+    txtPort= 1112
     pdfPort= 3333
     mp3Port= 4444
     otherPort= 5555
