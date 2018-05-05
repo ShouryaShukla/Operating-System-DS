@@ -28,7 +28,7 @@ def Main():
     # ip = socket.gethostname()
     ip = '127.0.1.1'
     host = ip
-    port = 2222
+    port = 2221
     AllFiles = os.listdir(path)
     NumFiles = len(AllFiles)
     print("Number of files are: " + str(NumFiles))
@@ -48,6 +48,8 @@ def Main():
     Send =''
     if NumFiles< 10:
         Send = '00'+str(NumFiles)
+    elif 10< NumFiles and NumFiles<100:
+        Send = '0'+str(NumFiles)
     SendNum = str(Send).encode()
     s.send(SendNum)
 

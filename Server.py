@@ -7,8 +7,8 @@ ServerFile = open('Server File.txt', "a+")
 
 def Main():
     host = socket.gethostbyname(socket.gethostname())
-    port = 2222
-    txtPort= 1112
+    port = 2221
+    txtPort= 1111
     pdfPort= 3333
     mp3Port= 4444
     otherPort= 5555
@@ -61,7 +61,7 @@ def Main():
 
     print("NumFiles: "+numFiles)
     # print(int(numFiles))
-    for i in range(0, int(numFiles)-1):
+    for i in range(0, int(numFiles)):
         # print(int(numFiles[:1]))
         file_name = ''
         file_data = ''
@@ -73,24 +73,24 @@ def Main():
             # print("Current: "+current)
             if current == '#' and counter == 1:
                 file_name = SumCurrent
-                print("File Name is "+file_name)
+                #print("File Name is "+file_name)
                 SumCurrent = ''
                 counter += 1
             if current == '$' and counter == 2:
                 file_data = SumCurrent
                 file_data = file_data[1:]
-                print("File data is: "+file_data)
+                #print("File data is: "+file_data)
 
                 extt = file_name.split('.')
                 ext = extt[1]
-                print("File Name is " + file_name)
+                #print("File Name is " + file_name)
                 # print("Data is " + file_data)
                 if ext == 'txt':
                     ServerFile.write(file_name + ' ' + 'txtNode ' + str(txtPort) + '\n')
 
 
                     SendTxt = file_name + '#' + file_data + '$'
-                    print("Sending: " + SendTxt)
+                    print("Sending From Server: " + SendTxt)
                     SendTxt = SendTxt.encode()
                     t.send(SendTxt)
                     time.sleep(5)
