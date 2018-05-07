@@ -6,10 +6,10 @@ import time
 #import PyPDF2
 
 CliPath = os.getcwd()
-path = CliPath + '/Nodes'
+path = CliPath# + '/Nodes'
 Pathtxt = os.getcwd() + '/txtFolder'
-if not os.path.exists(path):
-    os.makedirs(path)
+if not os.path.exists(Pathtxt):
+    os.makedirs(Pathtxt)
 
 
 def sendFile(file):
@@ -51,8 +51,10 @@ def Main():
         if cnt_down is False:
             file_size = d.recv(32)
             file_size = int(file_size, 2)
+            os.chdir(Pathtxt)
+            #  print(Pathtxt)
             chunk = 4096
-            with open(os.path.join(path, file_name), 'wb') as f:
+            with open(os.path.join(Pathtxt, file_name), 'wb') as f:
                 while file_size > 0:
                     if file_size < chunk:
                         chunk = file_size
@@ -67,10 +69,11 @@ def Main():
             #  print("Counter Ack")
             folder = "/txtFolder"
             Path = CliPath + folder
+
            #   print("Path is:"+Path)
             if not os.path.exists(Path):
                 os.makedirs(Path)
-            onlyfiles = [fl for fl in listdir(Path) if isfile(join(Path, fl))]
+            onlyfiles = [fl for fl in listdir(Pathtxt) if isfile(join(Pathtxt, fl))]
 
             if file_name in onlyfiles:
                 print("Sending " + file_name)

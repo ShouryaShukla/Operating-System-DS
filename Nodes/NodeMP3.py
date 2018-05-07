@@ -6,10 +6,10 @@ import time
 #import PyPDF2
 
 CliPath = os.getcwd()
-path = CliPath + '/Nodes'
+path = CliPath
 Pathtxt = os.getcwd() + '/MP3Folder'
-if not os.path.exists(path):
-    os.makedirs(path)
+if not os.path.exists(Pathtxt):
+    os.makedirs(Pathtxt)
 
 
 def sendFile(file):
