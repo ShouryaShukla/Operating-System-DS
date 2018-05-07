@@ -6,7 +6,9 @@ from os import listdir
 from os.path import isfile, join
 #import PyPDF2
 
-path = 'ClientFolder'
+
+CliPath = os.getcwd()
+path = CliPath +'/ClientFolder'
 if not os.path.exists(path):
     os.makedirs(path)
 
@@ -19,85 +21,75 @@ def sendFile(file):
     return data
 
 
-def getFileName(file):
-    h, t = ntpath.split(file)
-    return t or ntpath.basename(h)
-
-
 def Main():
     # ip = socket.gethostname()
     ip = '127.0.1.1'
     host = ip
     port = 2221
-    # AllFiles = os.listdir(path)
-    # NumFiles = len(AllFiles)
-    # print("Number of files are: " + str(NumFiles))
-    onlyfiles = [fl for fl in listdir(path) if isfile(join(path, fl))]
-    print(onlyfiles)
 
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect((host, port))
-    folder = "/ClientFolder"
-    Path = os.getcwd()
-    Path = Path + folder
-    os.chdir(Path)
-    # ss = s.recv(1024)
-    # ss.decode()
-    # filePath = raw_input(ss)
-    # (file_name, file_data) = sendFile(filePath)
+    ask = ''
+    while ask != '4':
+        print("path is "+path)
+        onlyfiles = [fl for fl in listdir(path) if isfile(join(path, fl))]
+        print(onlyfiles)
+        os.chdir(path)
 
-    # extt = file_name.split('.')
-    # ext = extt[1]
-    #Send =''
-    # if NumFiles< 10:
-    #     Send = '00'+str(NumFiles)
-    # elif 10< NumFiles and NumFiles < 100:
-    #     Send = '0'+str(NumFiles)
-    # SendNum = str(Send).encode()
-    # s.send(SendNum)
+        ask = raw_input("Input 1 for sync, 2 for Download, 3 for check file, 4 for quit")
+        if ask == '4':
+            s.close()
+            break
 
-     # ASK USER IF THEY WANT SYNC OR DOWNLOAD
-    for files in onlyfiles:
-        print("Sending " + files)
-        size = len(files)
-        size = bin(size)[2:].zfill(16)
-        print(size)
-        s.send(size)
-        time.sleep(2)
-        s.send(files)
+        if str(ask) == '1':
+            for file in onlyfiles:
+                print("Sending " + file)
+                size = len(file)
+                size = bin(size)[2:].zfill(16)
+                print(size)
+                s.send(size)
+                time.sleep(2)
+                s.send(file)
 
-        file_path = os.path.join(Path, files)
-        file_size = os.path.getsize(file_path)
-        file_size = bin(file_size)[2:].zfill(32)
-        s.send(file_size)
+                file_path = os.path.join(path, file)
+                file_size = os.path.getsize(file_path)
+                file_size = bin(file_size)[2:].zfill(32)
+                s.send(file_size)
+                data = sendFile(file)
+                s.sendall(data)
+                print("Sent: "+file)
 
-        data = sendFile(files)
-        s.sendall(data)
-        print("Sent.")
+        elif str(ask) == '2':
+            down = raw_input("Enter file to be Downloaded")
+            print("Downloading: " + down)
+            down += "#"
+            size1 = len(down)
+            size1 = bin(size1)[2:].zfill(16)
+            s.send(size1)
+            time.sleep(2)
+            s.send(down)
 
-
-    # time.sleep(2)
-    # for file in onlyfiles:
-    #     filePath = path+'/'+file
-    #     print(filePath)
-    #     (file_name, file_data) = sendFile(filePath)
-    #     fn = (file_name + '#').encode() + (file_data + '$').encode()
-    #     print("Extention "+fn)
-    #     s.send(fn)
-    #     time.sleep(5)
-    #     # fd = file_data.encode()
-    #     # s.send(fd)
-    #     print("Name "+file_name)
-    #     print("Data " + file_data)
-
-
-    # Haven't been able to figure this part out
-    # elif(ext=='pdf'):
-    #     ...
-    # elif (ext=='mp3'):
-    #     ...
-    # else:
-    #     ...
+            size = s.recv(16)
+            if not size:
+                break
+            size = int(size, 2)
+            file_name = s.recv(size)
+            file_size = s.recv(32)
+            file_size = int(file_size, 2)
+            chunk = 4096
+            folder = "/DownFiles"
+            Path = CliPath + folder
+            if not os.path.exists(Path):
+                os.makedirs(Path)
+            #os.chdir(Path)
+            with open(os.path.join(Path, file_name), 'wb') as f:
+                while file_size > 0:
+                    if file_size < chunk:
+                        chunk = file_size
+                    data = s.recv(chunk)
+                    f.write(data)
+                    file_size -= len(data)
+            print("Received " + file_name)
 
 
 if __name__ == '__main__':

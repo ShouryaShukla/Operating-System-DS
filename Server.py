@@ -23,41 +23,6 @@ def Main():
     c, addr = s.accept()
     print ("Connection from: " + str(addr))
 
-
-    #t.bind((host, txtPort))
-    #t.listen(1)
-    #d, addr2 = t.accept()
-    #print ("Connection from: " + str(addr2))
-
-    #
-    # u=socket.socket()
-    # u.bind((host, pdfPort))
-    # u.listen(1)
-    # e, addr3= t.accept()
-    # print ("Connection from: " + str(addr3))
-    #
-    #
-    # v=socket.socket()
-    # v.bind((host, mp3Port))
-    # v.listen(1)
-    # f, addr4= t.accept()
-    # print ("Connection from: " + str(addr4))
-    #
-    #
-    #
-    # w=socket.socket()
-    # w.bind((host, txtPort))
-    # w.listen(1)
-    # g, addr5= t.accept()
-    # print ("Connection from: " + str(addr5))
-
-
-    # st = 'Please Upload file (with path) to be synced: '
-    # byt = st.encode()
-    # c.send(byt)
-    # numFiles = c.recv(3)
-    # numFiles = str(numFiles.decode())
-
     t = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     t.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     t.connect((host, txtPort))
@@ -76,18 +41,23 @@ def Main():
 
     while True:
         size = c.recv(16)
+        cnt_down = False
         # print(size)
         if not size:
             break
-        int_size = int(size, 2)
-        file_name = c.recv(int_size).decode()
+        name_size = int(size, 2)
+        file_name = c.recv(name_size).decode()
+        if file_name[-1] == '#':
+            file_name = file_name[:-1]
+            size = len(file_name)
+            cnt_down = True
         print(file_name)
 
         file_type = file_name[file_name.index('.') + 1:]
         if file_type != "txt" and file_type != "pdf" and file_type != "mp3":
             file_type = "other"
 
-        index[file_name] = storage[file_type]
+
         if file_type == "txt":
             typ = t
         elif file_type == "pdf":
@@ -97,102 +67,74 @@ def Main():
         else:
             typ = o
 
-        typ.send(size)
-        typ.send(file_name.encode())
 
-        file_size = c.recv(32)
-        typ.send(file_size)
-        time.sleep(2)
-        file_size = int(file_size, 2)
-        block = 4096
-        while file_size > 0:
-            if file_size < block:
-                block = file_size
-            data = c.recv(block)
-            typ.send(data)
-            file_size -= len(data)
-    ServerFile.write(str(index))
+        if cnt_down == False:
+            size = len(file_name.encode())
+            size = bin(size)[2:].zfill(16)
+            typ.send(size)
 
-    # print("NumFiles: "+numFiles)
-    # # print(int(numFiles))
-    # for i in range(0, int(numFiles)):
-    #     # print(int(numFiles[:1]))
-    #     file_name = ''
-    #     file_data = ''
-    #     counter = 1
-    #     SumCurrent = ''
-    #     while True:
-    #         current = c.recv(1)
-    #         current = str(current.decode())
-    #         # print("Current: "+current)
-    #         if current == '#' and counter == 1:
-    #             file_name = SumCurrent
-    #             #print("File Name is "+file_name)
-    #             SumCurrent = ''
-    #             counter += 1
-    #         if current == '$' and counter == 2:
-    #             file_data = SumCurrent
-    #             file_data = file_data[1:]
-    #             #print("File data is: "+file_data)
-    #
-    #             extt = file_name.split('.')
-    #             ext = extt[1]
-    #             #print("File Name is " + file_name)
-    #             # print("Data is " + file_data)
-    #             if ext == 'txt':
-    #                 ServerFile.write(file_name + ' ' + 'txtNode ' + str(txtPort) + '\n')
-    #
-    #
-    #                 SendTxt = file_name + '#' + file_data + '$'
-    #                 print("Sending From Server: " + SendTxt)
-    #                 SendTxt = SendTxt.encode()
-    #                 t.send(SendTxt)
-    #                 time.sleep(5)
-    #             break
-    #
-    #         SumCurrent += current
-    #         if not current:
-    #             break
+            index[file_name] = storage[file_type]
 
-        #file_name = c.recv(1024)
-        #file_name = str(file_name.decode())
-        #print("Got Name: "+file_name)
-        #print(file_name)
-        #time.sleep(1)
-        #file_data = c.recv(1024)
-        #file_data = str(file_data.decode())
-        #print("Got Data: "+file_data)
-       # print(file_data)
-        #file_data.decode()
-            # if not file_name:
-            #     break
-        # print "Request received from client: " + str(data)
+            typ.send(file_name.encode())
 
-        # print "Number of results: " + str(len(data))
+            file_size = c.recv(32)
+            typ.send(file_size)
+            time.sleep(2)
+            file_size = int(file_size, 2)
+            block = 4096
+            while file_size > 0:
+                if file_size < block:
+                    block = file_size
+                data = c.recv(block)
+                typ.send(data)
+                file_size -= len(data)
+            ServerFile.write(str(index))
 
-        # File= open(path+"/"+file_name, "a+")
-        # File.write(file_data)
+        if cnt_down == True:  # When server has to download to client
+            file_name += '#'
 
-            # time.sleep(2)
-            # d2 = file_data.encode()
-            # d.send(d2)
+            print("Sending "+file_name)
 
-        # Haven't been able to figure this part out
-        # elif(ext=='pdf'):
-        #     ServerFile.write(file_name + ' ' + 'pdfNode' + str(pdfPort))
-        #    send file through pdfPort
-        # elif (ext=='mp3'):
-        #     ServerFile.write(file_name + ' ' + 'mp3Node' + str(mp3Port))
-        #    send file through mp3Port
-        # else:
-        #     ServerFile.write(file_name + ' ' + 'OoherNode' + str(otherPort))
-        #    send file through otherPort
+
+            size1 = len(file_name.encode())
+            size1 = bin(size1)[2:].zfill(16)
+            typ.send(size1)
+            time.sleep(2)
+            typ.sendall(file_name.encode())  # Sent file_name size and file_name to Node
+
+
+            sizefn = typ.recv(16)  # Getting file_name size from Node
+            print(sizefn)
+            if not sizefn:
+                break
+            sizefn = int(sizefn, 2)
+            file_name = typ.recv(sizefn)  # Getting file_name from Node
+            print("Server Got Name "+file_name)
+            file_size = typ.recv(32)
+            file_size = int(file_size, 2)  # File_data size
+            print("Size is "+str(file_size))
+            chunk = 4096
+            full_data = ""
+            while file_size > 0:  # File_data
+                if file_size < chunk:
+                    chunk = file_size
+                data = typ.recv(chunk)
+                full_data += data
+                file_size -= len(data)
+
+            print("Received From Node: " + file_name)
+            size = len(file_name)
+            size = bin(size)[2:].zfill(16)
+            c.send(size)
+            c.send(file_name)
+            file_size = len(full_data)
+            file_size = bin(file_size)[2:].zfill(32)
+            c.send(file_size)
+            print("Full data is "+full_data)
+            c.sendall(full_data)  # Sending file data
 
     c.close()
-    #d.close()
-    # e.close()
-    # f.close()
-    # g.close()
+
 
 if __name__ == '__main__':
     Main()
