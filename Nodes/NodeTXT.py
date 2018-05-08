@@ -19,8 +19,8 @@ def sendFile(file):
     return data
 
 def Main():
-    #ip = '127.0.1.1'
-    host = socket.gethostbyname(socket.gethostname())
+    ip = socket.gethostbyname(socket.gethostname())
+    host = ip
     port = 1111
 
     t = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

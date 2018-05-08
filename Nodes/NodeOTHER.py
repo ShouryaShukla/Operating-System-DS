@@ -52,7 +52,8 @@ def Main():
             file_size = d.recv(32)
             file_size = int(file_size, 2)
             chunk = 4096
-            with open(os.path.join(path, file_name), 'wb') as f:
+            os.chdir(Pathtxt)
+            with open(os.path.join(Pathtxt, file_name), 'wb') as f:
                 while file_size > 0:
                     if file_size < chunk:
                         chunk = file_size
@@ -70,7 +71,7 @@ def Main():
            #   print("Path is:"+Path)
             if not os.path.exists(Path):
                 os.makedirs(Path)
-            onlyfiles = [fl for fl in listdir(Path) if isfile(join(Path, fl))]
+            onlyfiles = [fl for fl in listdir(Pathtxt) if isfile(join(Pathtxt, fl))]
 
             if file_name in onlyfiles:
                 print("Sending " + file_name)
