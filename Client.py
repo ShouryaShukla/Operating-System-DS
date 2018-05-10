@@ -31,9 +31,9 @@ def Main():
     s.connect((host, port))
     ask = ''
     while ask != '4':
-        print("path is "+path)
+        #  print("path is "+path)
         onlyfiles = [fl for fl in listdir(path) if isfile(join(path, fl))]
-        print(onlyfiles)
+        #  print(onlyfiles)
         os.chdir(path)
 
         ask = raw_input("Input 1 for sync, 2 for Download, 3 for check file, 4 for quit")
@@ -46,7 +46,7 @@ def Main():
                 print("Sending " + file)
                 size = len(file)
                 size = bin(size)[2:].zfill(16)
-                print(size)
+                #  print(size)
                 s.send(size)
                 time.sleep(2)
                 s.send(file)
@@ -90,6 +90,26 @@ def Main():
                     f.write(data)
                     file_size -= len(data)
             print("Received " + file_name)
+
+        elif str(ask) == '3':
+            print("Fetching List of Files")
+            Check = '$'
+            sizeCh = len(Check)
+            sizeCh = bin(sizeCh)[2:].zfill(16)
+            s.send(sizeCh)
+            time.sleep(2)
+            s.send(Check)
+
+            sizerc = s.recv(16)
+            if not sizerc:
+                break
+            sizerc = int(sizerc, 2)
+            listeles = s.recv(sizerc).decode()
+            print("The files and their corresponding nodes are: " + str(listeles))
+
+
+
+
 
 
 if __name__ == '__main__':
